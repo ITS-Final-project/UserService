@@ -21,7 +21,7 @@ jobs:
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: docker build nodeJS
       run: |
-        docker build ./src -t antasmes/zr-mainservice:latest
+        docker build ./src -t antasmes/zr-userservice:latest
     - name: docker-push
       run: |
-        docker push antasmes/zr-mainservice:latest
+        docker push antasmes/zr-userservice:latest
