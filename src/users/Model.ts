@@ -6,15 +6,15 @@ export class User extends Model{
     public username: string;
     public email: string;
     public password: string;
-    public role: string;
+    public roles: string[] = [];
     public session: UserSession | null = null;
 
-    constructor(username: string, email: string, password: string, role: string, created: Date, updated: Date) {
+    constructor(username: string, email: string, password: string, roles: string[], created: Date, updated: Date) {
         super(created, updated);
         this.username = username;
         this.email = email;
         this.password = password;
-        this.role = role;
+        this.roles = roles;
     }
 }
 
@@ -24,25 +24,25 @@ export class UserResponse {
     public username: string;
     public email: string;
     public session: any = {};
+    public roles: string[] = [];
 
-    constructor(id: string, username: string, email: string, session: any) {
+    constructor(id: string, username: string, email: string, roles: string[], session: any) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.session = session;
+        this.roles = roles;
     }
 }
 
 export class UserSession {
-    public id: string;
-    public token: string;
+    public id: string = uuid();
+    public token: string = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     public validFrom: Date;
     public validHours: number;
     public validTo: Date;
 
-    constructor(id: string = "", token: string, validFrom: Date, validHours: number) {
-        this.id = id == "" ? uuid() : id;
-        this.token = token;
+    constructor(validFrom: Date, validHours: number) {
         this.validFrom = validFrom;
         this.validHours = validHours;
 
