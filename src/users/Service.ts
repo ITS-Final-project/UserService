@@ -39,7 +39,7 @@ export class UserService{
                 return;
             }
 
-            this.updateSession(user, new UserSession("", 'token', new Date(), 1)).then((ack) => {
+            this.updateSession(user, new UserSession(new Date(), 1)).then((ack) => {
                 if (!ack.acknowledged) {
                     reject('Could not update session');
                     return;
@@ -96,6 +96,17 @@ export class UserService{
             }
 
             resolve(user);
+        });
+    }
+
+    public async logout(user: User): Promise<any> {
+        return new Promise<any>(async (resolve, reject) => {
+            user.session = null;
+            UserService._repository.update(user).then((user) => {
+                resolve(user);
+            }).catch((err) => {
+                reject(err);
+            });
         });
     }
 

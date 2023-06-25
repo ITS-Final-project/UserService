@@ -28,12 +28,41 @@ export class UserController {
             res.sendFile('register.ejs', { root: __dirname + '/../views/' });
         });
 
-        router.get('/logout', async (req, res) => {
-            res.clearCookie('auth');
-            res.redirect('/users/login');
-        });
-
         //! ========================== POST METHODS ==========================
+
+        router.post('/logout', this._authHandler.verify(new USSecret()), async (req, res) => {
+            var data = res.locals.data as JwtPayload;
+
+            console.log(data);
+
+            if (!data.user) {
+                res.status(400).send('User is required');
+                return;
+            }
+
+            if (!data.user.session) {
+                res.status(400).send('Session is required');
+                return;
+            }
+
+            if (!data.user.session.id) {
+                res.status(400).send('Session id is required');
+                return;
+            }
+
+
+
+            this._service.logout(data.user).then((ack) => {
+                if (!ack.acknowledged) {
+                    res.status(400).send('Could not logout');
+                    return;
+                }
+
+                res.status(200).send('Logged out');
+            }).catch((err) => {
+                res.status(400).send('Could not logout');
+            });
+        });
 
         //* Login
         //* Body: token
@@ -57,7 +86,7 @@ export class UserController {
 
             try{
                 this._service.login(usernameOrEmail, password).then((user) => {
-                    const token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.session) }, new USSecret());
+                    const token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, user.session) }, new USSecret());
                     res.status(200).send({token: token});
                 }).catch((err) => {
                     // Send unauthorized
@@ -94,10 +123,10 @@ export class UserController {
                 return;
             }
 
-            var user = new User(username, email, password, 'user', new Date(), new Date());
+            var user = new User(username, email, password, ['user'], new Date(), new Date());
 
             this._service.register(user).then((user) => {
-                const token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, {})}, new USSecret());
+                const token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, {})}, new USSecret());
 
                 res.status(200).send({token: token});
             }).catch((err) => {
@@ -128,7 +157,7 @@ export class UserController {
             }
 
             this._service.checkSession(data).then((user) => {
-                var token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.session) }, new USSecret());
+                var token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, user.session) }, new USSecret());
                 res.status(200).send({token : token});
             }).catch((err) => {
                 res.status(401).send('Unauthorized');
