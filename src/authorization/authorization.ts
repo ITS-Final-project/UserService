@@ -34,7 +34,7 @@ export class AuthHandler implements IAuthHandler {
         } else {
             return (req: any, res: any, next: any) => {
                 var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.auth;
-
+                console.log(token);
                 if (!token) {
                     res.status(401).send('Unauthorized');
                     return;
