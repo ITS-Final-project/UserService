@@ -1,0 +1,8 @@
+{
+    "username": "admin",
+    "password": "admin",
+    "email": "admin.1@localhost",
+    "firstName": "Admin",
+    "lastName": "Admin",
+    "role": "admin"
+}

@@ -1,0 +1,186 @@
+<style>
+    body {
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: #fff  !important;
+        opacity: 0.9 !important; 
+    }
+
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: #fff  !important;
+        opacity: 0.9 !important;
+    }
+
+    ::-ms-input-placeholder { /* Microsoft Edge */
+        color: #fff !important;
+        opacity: 0.9 !important;
+    }
+
+    ::-ms-reveal, ::-ms-clear {
+        filter: invert(100%);
+    }
+
+    .login-container{
+        backdrop-filter: blur(16px) saturate(67%);
+        -webkit-backdrop-filter: blur(16px) saturate(67%);
+        background-color: rgba(17, 25, 40, 0.43);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.125);
+
+        /* Drop shadow */
+        -webkit-box-shadow: 4px 5px 14px -1px rgba(0,0,0,0.23); 
+        box-shadow: 4px 5px 14px -1px rgba(0,0,0,0.23);
+    }
+
+    .input-control{
+        background-color: rgba(17, 25, 40, 0.1);
+        border-radius: 12px;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        color: #fff;
+        transition: all 0.2s;
+        font-size: large;
+    }
+
+    .input-control:focus, .input-control:active, .input-control:not(:placeholder-shown){
+        background-color: #1f2a37;
+        border-radius: 30px;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        color: #fff;
+        transition: all 0.2s;
+        font-size: large;
+
+        /* No focus border */
+        box-shadow: none;
+        outline: none;
+    }
+
+    .group-text {
+        color: #fff;
+        background-color: #1f2a37;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+    }
+
+    .btn-login{
+        transition: all 0.2s;
+        font-size: large;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        
+        color: #fff;
+    }
+
+    .btn-login:hover{
+        transition: all 0.2s;
+        font-size: large;
+        border: 1px solid rgba(255, 255, 255, 0.096);
+        color: #fff;
+        background-color: #1f2a37;
+
+        border-radius: 10px 30px 30px 10px;
+    }
+
+    .btn-register{
+        transition: all 0.2s;
+        font-size: large;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        
+        color: #fff;
+    }
+
+    .btn-register:hover{
+        transition: all 0.2s;
+        font-size: large;
+        border: 1px solid rgba(255, 255, 255, 0.096);
+        color: #fff;
+        background-color: #1f2a37;
+
+        border-radius: 30px 10px 10px 30px;
+    }
+
+    .error-container{
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 30px;
+        padding: 1px;
+        width: 75%;
+        margin: auto;
+    }
+
+    #error-text{
+        font-size: large;
+        margin: 0;
+    }
+</style>
+
+<div class="container h-100">
+    <div class="d-flex align-items-center h-75">
+        <div class="w-50 card mx-auto p-5 login-container">
+            <div class="card-title">
+                <h1 class="text-center text-light">Login</h1>
+            </div>
+            <form action="/user/login" method="post">
+                <div class="mb-3 mt-3">
+                    <label for="usernameOrEmail" class="form-label text-light">Username or Email</label>
+                    <div class="input-group">
+                        <label for="usernameOrEmail" class="input-group-text text-light group-text"><i class="bi bi-envelope"></i></label>
+                        <input type="text" name="usernameOrEmail" id="usernameOrEmail" class="form-control input-control" placeholder="example@company.com" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label text-light">Password</label>
+                    <div class="input-group">
+                        <label for="password" class="input-group-text text-light group-text"><i class="bi bi-lock-fill"></i></label>
+                        <input type="password" name="password" id="password" class="form-control input-control" placeholder="Password" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 error-container" id="error-container" hidden>
+                    <div class="d-flex justify-content-center">
+                        <p class="text-danger" id="error-text"></p>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-end">
+                        <a href="/user/forgot" class="text-light">Forgot password?</a>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="d-flex justify-content-between">
+                        <a href="/user/register" class="btn w-50 btn-register m-1">Register</a>
+                        <button type="submit" class="btn w-50 btn-login m-1">Login</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showError(){
+        var error = "Username or password is incorrect";
+        var errorContainer = document.getElementById("error-container");
+        var errorText = document.getElementById("error-text");
+
+        errorContainer.hidden = false;
+        errorText.innerHTML = error;
+    }
+
+    function hideError(){
+        var errorContainer = document.getElementById("error-container");
+        var errorText = document.getElementById("error-text");
+        
+        errorContainer.hidden = true;
+        errorText.innerHTML = "";
+    }
+</script>

@@ -1,0 +1,205 @@
+<style>
+    body {
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: #fff  !important;
+        opacity: 0.9 !important; 
+    }
+
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: #fff  !important;
+        opacity: 0.9 !important;
+    }
+
+    ::-ms-input-placeholder { /* Microsoft Edge */
+        color: #fff !important;
+        opacity: 0.9 !important;
+    }
+
+    ::-ms-reveal, ::-ms-clear {
+        filter: invert(100%);
+    }
+
+    .register-container{
+        backdrop-filter: blur(16px) saturate(67%);
+        -webkit-backdrop-filter: blur(16px) saturate(67%);
+        background-color: rgba(17, 25, 40, 0.43);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.125);
+
+        /* Drop shadow */
+        -webkit-box-shadow: 4px 5px 14px -1px rgba(0,0,0,0.23); 
+        box-shadow: 4px 5px 14px -1px rgba(0,0,0,0.23);
+    }
+
+    .input-control{
+        background-color: rgba(17, 25, 40, 0.1);
+        border-radius: 12px;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        color: #fff;
+        transition: all 0.2s;
+        font-size: large;
+    }
+
+    .input-control:focus, .input-control:active, .input-control:not(:placeholder-shown){
+        background-color: #1f2a37 !important;
+        border-radius: 30px;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        color: #fff;
+        transition: all 0.2s;
+        font-size: large;
+
+        /* No focus border */
+        box-shadow: none;
+        outline: none;
+    }
+
+    .group-text {
+        color: #fff;
+        background-color: #1f2a37;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+    }
+
+    .btn-login{
+        transition: all 0.2s;
+        font-size: large;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        
+        color: #fff;
+    }
+
+    .btn-login:hover{
+        transition: all 0.2s;
+        font-size: large;
+        border: 1px solid rgba(255, 255, 255, 0.096);
+        color: #fff;
+        background-color: #1f2a37;
+        border-radius: 30px 10px 10px 30px;
+        
+    }
+
+    .btn-register{
+        transition: all 0.2s;
+        font-size: large;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        
+        color: #fff;
+    }
+
+    .btn-register:hover{
+        transition: all 0.2s;
+        font-size: large;
+        border: 1px solid rgba(255, 255, 255, 0.096);
+        color: #fff;
+        background-color: #1f2a37;
+
+        border-radius: 10px 30px 30px 10px;
+    }
+
+</style>
+
+<div class="container h-100">
+    <div class="d-flex align-items-center h-75">
+        <div class="w-50 card mx-auto p-5 register-container">
+            <div class="card-title">
+                <h1 class="text-center text-light">Register</h1>
+            </div>
+            <form action="/user/register" method="post">
+                <div class="mb-3 mt-3">
+                    
+                    <label for="username" class="form-label text-light">Username</label>
+                    <div class="input-group">
+                        <label for="username" class="input-group-text text-light group-text"><i class="bi bi-person-circle"></i></label>
+                        <input type="text" name="username" id="username" class="form-control input-control" placeholder="Username" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 mt-3">
+                    <label for="email" class="form-label text-light">Email</label>
+                    <div class="input-group">
+                        <label for="email" class="input-group-text text-light group-text">@</label>
+                        <input type="text" name="email" id="email" class="form-control input-control" placeholder="example@company.com" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label text-light">Password</label>
+                    <div class="input-group">
+                        <label for="password" class="input-group-text text-light group-text"><i class="bi bi-lock"></i></label>
+                        <input onchange="strongPassword()" type="password" name="password" id="password" class="form-control input-control" placeholder="Password" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="confirmPassword" class="form-label text-light">Confirm Password</label>
+                    <div class="input-group">
+                        <label for="confirmPassword" class="input-group-text text-light group-text"><i class="bi bi-lock-fill"></i></label>
+                        <input type="password" name="confirmPassword" id="confirmPassword" class="form-control input-control" placeholder="Confirm Password" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="d-flex justify-content-between">
+                        <a href="/user/login" class="btn w-50 btn-login m-1">Login</a>
+                        <button onclick="checkPasswords()" type="submit" class="btn w-50 btn-register m-1">Register</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="w-50 card mx-auto pt-3 register-container">
+        <div class="text-center text-light">
+            <p>
+                Password must contain:
+                <br>
+                At least 8 characters
+                <br>
+                At least one uppercase letter
+                <br>
+                At least one lowercase letter
+                <br>
+                At least one number
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function badField(id, message) {
+        document.getElementById(id).style.borderColor = "red";
+        document.getElementById(id).style.backgroundColor = "rgba(255, 0, 0, 0.1)";
+        document.getElementById(id).setCustomValidity(message);
+    }
+
+    function checkPasswords() {
+        let password = document.getElementById("password");
+        let confirmPassword = document.getElementById("confirmPassword");
+
+        if (password.value != confirmPassword.value) {
+            confirmPassword.setCustomValidity("Passwords don't match");
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+
+    function strongPassword(){
+        var regex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})");
+        var password = document.getElementById("password");
+
+        if (!regex.test(password.value)) {
+            password.setCustomValidity("Check password requirements");
+        } else {
+            password.setCustomValidity('');
+        }
+    }
+</script>

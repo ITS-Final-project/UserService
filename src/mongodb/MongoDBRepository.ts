@@ -1,7 +1,8 @@
 import { Collection, Db, Document, MongoClient } from "mongodb";
 import { MongoServerConfiguration } from "../configuration/mongoServerConfiguration";
+import { Model } from "./MongoDbModel";
 
-export abstract class MongoRepository<T extends Document> {
+export abstract class MongoRepository<T extends Model> {
     protected _collection: Collection | null = null;
     protected _client: MongoClient | null = null;
     protected _collectionName: string;
@@ -24,6 +25,10 @@ export abstract class MongoRepository<T extends Document> {
     public async insert (document: T): Promise<any> {
         if(!await this._isConnected()) return false;
 
+        // Sanitize document
+        
+
+
         // this.logData.method = "insert";
         // this.logData.document = document;
 
@@ -34,6 +39,27 @@ export abstract class MongoRepository<T extends Document> {
         } catch (err) {
             //this.logData.error = err;
             // logger.error(this.logData);
+
+            return false;
+        }
+    }
+
+    public async update(document: T): Promise<any> {
+        if(!await this._isConnected()) return false;
+
+        // this.logData.method = "update";
+        // this.logData.document = document;
+
+        try {
+            // logger.info(this.logData);
+            document.updated = new Date();
+            return await this._collection!!.updateOne({ id: document.id }, { $set: document });
+        } catch (err) {
+
+            console.log("Error updating document: " + err);
+            // this.logData.error = err;
+            // logger.error(this.logData);
+
 
             return false;
         }

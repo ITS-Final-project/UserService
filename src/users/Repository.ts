@@ -7,7 +7,15 @@ export class UserRepository extends MongoRepository<User> {
         throw new Error("Method not implemented.");
     }
     
-    async findById(id: string): Promise<any> {
-        return await this._findDocumentsByFilter({id: id});
+    async findById(id: string): Promise<User> {
+        return (await this._findDocumentsByFilter({id: id})).at(0);
+    }
+
+    async findByUsername(username: string): Promise<User> {
+        return (await this._findDocumentsByFilter({username: username})).at(0);
+    }
+
+    async findByEmail(email: string): Promise<User> {
+        return (await this._findDocumentsByFilter({email: email})).at(0);
     }
 }
