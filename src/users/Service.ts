@@ -1,5 +1,4 @@
-import { JwtPayload } from "jsonwebtoken";
-import { User, UserSession } from "./Model";
+import { User } from "./Model";
 import { UserRepository } from "./Repository";
 
 export class UserService{
@@ -12,11 +11,73 @@ export class UserService{
         UserService._repository = new UserRepository(this._collection);
     }
 
+    public async findById(id: string): Promise<User> {
+        return await UserService._repository.findById(id);
+    }
+
     public static getInstance(): UserService{
         if(!UserService._instance){
             UserService._instance = new UserService();
         }
         return UserService._instance;
+    }
+
+    public async delete(id: string): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            UserService._repository.delete(id).then((result) => {
+                resolve(result);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    public async count(username: string, email: string, roles: string[]): Promise<number> {
+        return new Promise<number>(async (resolve, reject) => {
+            var filter = {} as any;
+            if(username){
+                filter['username'] = username;
+            }
+
+            if(email){
+                filter['email'] = email;
+            }
+
+            if(roles){
+                filter['roles'] = roles;
+            }
+
+            UserService._repository.count(filter).then((count) => {
+                resolve(count);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    public async search(username: string, email: string, roles: string[], pagesize: number, pagenumber: number): Promise<User[]> {
+        return new Promise<User[]>(async (resolve, reject) => {
+            var filter = {} as any;
+            if(username){
+                filter['username'] = username;
+            }
+            if(email){
+                filter['email'] = email;
+            }
+            if(roles){
+                filter['roles'] = {$all: roles};
+            }
+
+            UserService._repository.search(filter, pagesize, pagenumber)
+            .then((users) => {
+                users.forEach((user) => {
+                    user.password = '';
+                });
+                resolve(users);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
     }
 
     public async login(usernameOrEmail: string, password: string): Promise<User> {
@@ -39,16 +100,7 @@ export class UserService{
                 return;
             }
 
-            this.updateSession(user, new UserSession(new Date(), 1)).then((ack) => {
-                if (!ack.acknowledged) {
-                    reject('Could not update session');
-                    return;
-                }
-                resolve(user);
-            }).catch((err) => {
-                reject(err);
-            });
-
+            resolve(user);
         });
     }
 
@@ -76,49 +128,20 @@ export class UserService{
         });
     }
 
-    public async checkSession(data: JwtPayload): Promise<User> {
-        return new Promise<User>(async (resolve, reject) => {
-            var user = await UserService._repository.findById(data.user.id);
-
+    public async checkRole(userId: string, role: string): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            var user = await UserService._repository.findById(userId);
             if(!user){
                 reject('User not found');
                 return;
             }
 
-            if(!user.session || !user.session.token || user.session.token != data.user.session?.token){
-                reject('Invalid session');
+            if(!user.roles.includes(role)){
+                reject('User does not have role');
                 return;
             }
 
-            if(user.session.validTo < new Date()){
-                reject('Session expired');
-                return;
-            }
-
-            resolve(user);
+            resolve(true);
         });
     }
-
-    public async logout(user: User): Promise<any> {
-        return new Promise<any>(async (resolve, reject) => {
-            user.session = null;
-            UserService._repository.update(user).then((user) => {
-                resolve(user);
-            }).catch((err) => {
-                reject(err);
-            });
-        });
-    }
-
-    public updateSession(user: User, session: UserSession): Promise<any> {
-        return new Promise<User>(async (resolve, reject) => {
-            user.session = session;
-            UserService._repository.update(user).then((user) => {
-                resolve(user);
-            }).catch((err) => {
-                reject(err);
-            });
-        });
-    }
-
 }

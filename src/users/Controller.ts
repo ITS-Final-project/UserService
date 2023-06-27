@@ -7,18 +7,21 @@ import express from 'express';
 import { UserService } from './Service';
 import { User, UserResponse } from './Model';
 import { AuthHandler, IAuthHandler } from '../authorization/authorization';
+import { SessionService } from '../session/Service';
 
 const router = express.Router();
 
 export class UserController {
     private static _instance: UserController;
 
-    private _service: UserService;
+    private _userService: UserService;
+    private _sessionService: SessionService;
     private _authHandler: AuthHandler;
 
     private constructor() {
-        this._service = UserService.getInstance();
+        this._userService = UserService.getInstance();
         this._authHandler = AuthHandler.getInstance();
+        this._sessionService = SessionService.getInstance();
 
         router.get('/login', this._authHandler.verify(new USSecret()), async (req, res) => {
             res.sendFile('login.ejs', { root: __dirname + '/../views/' });
@@ -30,10 +33,80 @@ export class UserController {
 
         //! ========================== POST METHODS ==========================
 
-        router.post('/logout', this._authHandler.verify(new USSecret()), async (req, res) => {
+        router.post('/delete', this._authHandler.verify(new USSecret()), async (req, res) => {
             var data = res.locals.data as JwtPayload;
 
-            console.log(data);
+            if (!data.deleteId) {
+                res.status(400).send('Id is required');
+                return;
+            }
+
+            this._userService.delete(data.deleteId).then((ack) => {
+                res.status(200).send(ack);
+            }).catch((err) => {
+                res.status(400).send(err);
+            });
+        })
+
+        router.post('/create', this._authHandler.verify(new USSecret()), async (req, res) => {
+            var data = res.locals.data as JwtPayload;
+            try{
+                var username = data.username;
+                var password = data.password;
+                var email = data.email;
+                var roles = data.roles;
+            }catch(err){
+                res.status(400).send({
+                    message: 'Username, password, email and roles are required (first)',
+                    badFields: ['username', 'password', 'email']
+                });
+                return;
+            }
+
+            if (!username || !password || !email) {
+                res.status(400).send({
+                    message: 'Username, password, email and roles are required (second)',
+                    badFields: ['username', 'password', 'email']
+                });
+                return;
+            }
+
+            var user = new User(username, email, password, roles, new Date(), new Date());
+
+            this._userService.register(user).then((user) => {
+                res.status(200).send(user);
+            }).catch((err) => {
+                res.status(400).send(err);
+            });
+        })
+
+        router.post('/count', this._authHandler.verify(new USSecret()), async (req, res) => {
+            var data = res.locals.data as JwtPayload;
+
+            this._userService.count(data.username, data.email, data.roles).then((count) => {
+                res.status(200).send({count: count});
+            }).catch((err) => {
+                res.status(400).send({count: 0, error: err});
+            });
+        })
+
+        router.post('/search', this._authHandler.verify(new USSecret()), async (req, res) => {
+            var data = res.locals.data as JwtPayload;
+
+            if (!data.pagesize || !data.pagenumber) {
+                res.status(400).send('Pagesize and pagenumber are required');
+                return;
+            }
+
+            this._userService.search(data.username, data.email, data.roles, data.pagesize, data.pagenumber).then((users) => {
+                res.status(200).send(users);
+            }).catch((err) => {
+                res.status(400).send(err);
+            });
+        })
+
+        router.post('/logout', this._authHandler.verify(new USSecret()), async (req, res) => {
+            var data = res.locals.data as JwtPayload;
 
             if (!data.user) {
                 res.status(400).send('User is required');
@@ -50,18 +123,11 @@ export class UserController {
                 return;
             }
 
-
-
-            this._service.logout(data.user).then((ack) => {
-                if (!ack.acknowledged) {
-                    res.status(400).send('Could not logout');
-                    return;
-                }
-
-                res.status(200).send('Logged out');
+            this._sessionService.deleteSessionByUserId(data.user.id).then((ack) => {
+                res.status(200).send(ack);
             }).catch((err) => {
-                res.status(400).send('Could not logout');
-            });
+                res.status(400).send(err);
+            });            
         });
 
         //* Login
@@ -85,9 +151,15 @@ export class UserController {
             }
 
             try{
-                this._service.login(usernameOrEmail, password).then((user) => {
-                    const token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, user.session) }, new USSecret());
-                    res.status(200).send({token: token});
+                this._userService.login(usernameOrEmail, password).then((user) => {
+
+                    this._sessionService.createSession(user.id, 1).then((session) => {
+                        const token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, session) }, new USSecret());
+                        res.status(200).send({token: token});
+                    }).catch((err) => {
+                        res.status(400).send(err);
+                    });
+
                 }).catch((err) => {
                     // Send unauthorized
                     res.status(401).send('Unauthorized');
@@ -125,8 +197,8 @@ export class UserController {
 
             var user = new User(username, email, password, ['user'], new Date(), new Date());
 
-            this._service.register(user).then((user) => {
-                const token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, {})}, new USSecret());
+            this._userService.register(user).then((user) => {
+                const token = jwtConfiguration.sign({status: 200}, new USSecret());
 
                 res.status(200).send({token: token});
             }).catch((err) => {
@@ -134,35 +206,31 @@ export class UserController {
             });
         });
 
-        //* Check session
-        //* Body: token
-        //* Token data: user, user.session
-        //* Returns: token (200) or error (400)
-        router.post('/checkSession', this._authHandler.verify(new USSecret()), async (req, res) => {
+        router.post('/role/check', this._authHandler.verify(new USSecret()), async (req, res) => {
             var data = res.locals.data as JwtPayload;
+            try{
+                var user = data.user;
+                var role = req.body.role;
+            }catch(err){
+                res.status(400).send('Role is required');
+                return;
+            }
 
-            if (!data.user) {
+            if (!user) {
                 res.status(400).send('User is required');
                 return;
-            } 
+            }
 
-            if (!data.user.session) {
-                res.status(400).send('Session is required');
+            if (!role) {
+                res.status(400).send('Role is required');
                 return;
             }
 
-            if (!data.user.session.id) {
-                res.status(400).send('Session id is required');
-                return;
-            }
-
-            this._service.checkSession(data).then((user) => {
-                var token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, user.session) }, new USSecret());
-                res.status(200).send({token : token});
+            this._userService.checkRole(user.id, role).then((ack) => {
+                res.status(200).send("OK");
             }).catch((err) => {
-                res.status(401).send('Unauthorized');
+                res.status(401).send(err);
             });
-                
         });
     }
 
