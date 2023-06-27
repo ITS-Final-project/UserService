@@ -1,0 +1,311 @@
+<style>
+    body {
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: #fff  !important;
+        opacity: 0.9 !important; 
+    }
+
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: #fff  !important;
+        opacity: 0.9 !important;
+    }
+
+    ::-ms-input-placeholder { /* Microsoft Edge */
+        color: #fff !important;
+        opacity: 0.9 !important;
+    }
+
+    ::-ms-reveal, ::-ms-clear {
+        filter: invert(100%);
+    }
+
+    .login-container{
+        backdrop-filter: blur(16px) saturate(67%);
+        -webkit-backdrop-filter: blur(16px) saturate(67%);
+        background-color: rgba(17, 25, 40, 0.43);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.125);
+
+        /* Drop shadow */
+        -webkit-box-shadow: 4px 5px 14px -1px rgba(0,0,0,0.23); 
+        box-shadow: 4px 5px 14px -1px rgba(0,0,0,0.23);
+    }
+
+    .input-control, .input-control:focus, .input-control:active, .input-control:not(:placeholder-shown){
+        background-color: #1f2a37;
+        border-radius: 30px;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        color: #fff;
+        transition: all 0.2s;
+        font-size: large;
+
+        /* No focus border */
+        box-shadow: none;
+        outline: none;
+    }
+
+    .input-control-disabled{
+        background-color: rgba(17, 26, 41, 0.623) !important;
+        border-radius: 12px;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        color: #fff;
+        transition: all 0.2s;
+        font-size: large;
+
+        /* No focus border */
+        box-shadow: none;
+        outline: none;
+    }
+
+    .group-text {
+        color: #fff;
+        background-color: #1f2a37;
+
+        border: 1px solid rgba(255, 255, 255, 0.125);
+    }
+
+    .grid-container{
+        display: grid;
+        grid-template-columns: 0.5fr 1fr;
+        grid-template-rows: 1fr;
+        grid-gap: 10px;
+    }
+
+    .btn-change{
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.125);
+        background-color: #1f2a37;
+        color: #fff;
+        transition: all 0.2s;
+        font-size: large;
+    }
+
+    .btn-change:hover{
+        background-color: #2c3b4d;
+        color: #fff;
+        transition: all 0.2s;
+    }
+
+</style>
+
+<div class="container h-100">
+    <div class="grid-container w-75 m-auto">
+        <div class="card">
+            <!-- List of profile options -->
+            <!-- Information, Delete -->
+            <div class="card-header">
+                <h3>Opcije</h3>
+            </div>
+            <div class="card-body p-2">
+                <div class="list-group">
+                    <a onclick="showPage('info')" href="#" id="info" class="list-group-item list-group-item-action active" aria-current="true">
+                        Informacije
+                    </a>
+                    <a onclick="showPage('sec')" href="#" id="sec" class="list-group-item list-group-item-action">Zaštita</a>
+                    <a onclick="showPage('del')" href="#" id="del" class="list-group-item list-group-item-action">Brisanje</a>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="information-container" id="information-container">
+                <div class="card-header">
+                    <h3>Informacije</h3>
+                </div>
+                <form action="/user/edit" method="post">
+                    <div class="card-body">
+                        <input type="hidden" name="section" value="information">
+                        <div class="form-group mb-3">
+                            <label for="username">Korisničko ime</label>
+                            <div class="input-group">
+                                <input name="username" type="text" class="form-control input-control input-control-disabled" id="username" placeholder="Korisniško ime" value="Korisniško ime" readonly>
+                                <button type="button" id="lock-username" onclick="enableField('username')" class="input-group-text btn-change"><i class="bi bi-lock-fill"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="email">Email</label>
+                            <div class="input-group">
+                                <input name="email" type="text" class="form-control input-control input-control-disabled" id="email" placeholder="Email" value="Email" readonly>
+                                <button type="button" id="lock-email" onclick="enableField('email')" class="input-group-text btn-change"><i class="bi bi-lock-fill"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="form-group d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Sačuvaj</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="delete-container" id="delete-container" hidden>
+                <div class="card-header">
+                    <h3>Brisanje naloga</h3>
+                </div>
+                <form action="/user/edit" method="post">
+                    <div class="card-body">
+                        <input type="hidden" name="section" value="information">
+                        <div class="form-group mb-3">
+                            <label for="username">Korisničko ime</label>
+                            <div class="input-group">
+                                <input name="username" type="text" class="form-control input-control input-control-disabled" id="username" placeholder="Korisniško ime" value="Korisniško ime" readonly>
+                                <button type="button" id="lock-username" onclick="enableField('username')" class="input-group-text btn-change"><i class="bi bi-lock-fill"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="email">Email</label>
+                            <div class="input-group">
+                                <input name="email" type="text" class="form-control input-control input-control-disabled" id="email" placeholder="Email" value="Email" readonly>
+                                <button type="button" id="lock-email" onclick="enableField('email')" class="input-group-text btn-change"><i class="bi bi-lock-fill"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="form-group d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Sačuvaj</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="security-container" id="security-container" hidden>
+                <div class="card-header">
+                    <h3>Zaštita</h3>
+                </div>
+                <form action="/user/edit" method="post">
+                    <div class="card-body">
+                        <input type="hidden" name="section" value="password">
+                        <div class="form-group mb-3">
+                            <label for="oldPassword">Trenutna lozinka</label>
+                            <div class="input-group">
+                                <label for="oldPassword" class="input-group-text group-text"><i class="bi bi-lock-fill"></i></label>
+                                <input name="oldPassword" type="password" class="form-control input-control" id="oldPassword" placeholder="Trenutna lozinka">
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="newPassword">Nova lozinka</label>
+                            <div class="input-group">
+                                <label for="newPassword" class="input-group-text group-text"><i class="bi bi-lock"></i></label>
+                                <input onchange="validatePasswords()" name="newPassword" type="password" class="form-control input-control" id="newPassword" placeholder="Nova lozinka">
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="cpassword">Ponovite lozinku</label>
+                            <div class="input-group">
+                                <label for="cpassword" class="input-group-text group-text"><i class="bi bi-lock-fill"></i></label>
+                                <input onchange="validatePasswords()" name="cpassword" type="password" class="form-control input-control" id="cpassword" placeholder="Ponovite novu lozinku">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="form-group d-flex justify-content-end">
+                            <button onclick="return validatePasswords()" type="submit" class="btn btn-primary">Sačuvaj</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showInformation(json){
+        var username = document.getElementById("username");
+        var email = document.getElementById("email");
+
+        username.value = json.username;
+        email.value = json.email;
+    }
+
+    function enableField(id){
+        var field = document.getElementById(id);
+        field.removeAttribute("readonly");
+        field.classList.remove("input-control-disabled");
+
+        var lock = document.getElementById("lock-" + id);
+        // <i class="bi bi-lock-fill"></i>
+        lock.innerHTML = '<i class="bi bi-unlock-fill"></i>';
+        lock.attributes.onclick.value = "disableField('" + id + "')";
+    }
+
+    function disableField(id){
+        var field = document.getElementById(id);
+        field.setAttribute("readonly", true);
+        field.classList.add("input-control-disabled");
+
+        var lock = document.getElementById("lock-" + id);
+        // <i class="bi bi-lock-fill"></i>
+        lock.innerHTML = '<i class="bi bi-lock-fill"></i>';
+        lock.attributes.onclick.value = "enableField('" + id + "')";
+    }
+
+    function showError(){
+        var error = "Username or password is incorrect";
+        var errorContainer = document.getElementById("error-container");
+        var errorText = document.getElementById("error-text");
+
+        errorContainer.hidden = false;
+        errorText.innerHTML = error;
+    }
+
+    function hideError(){
+        var errorContainer = document.getElementById("error-container");
+        var errorText = document.getElementById("error-text");
+        
+        errorContainer.hidden = true;
+        errorText.innerHTML = "";
+    }
+
+    function showPage(id){
+        var informationContainer = document.getElementById("information-container");
+        var securityContainer = document.getElementById("security-container");
+        var deleteContainer = document.getElementById("delete-container");
+
+        informationContainer.hidden = true;
+        securityContainer.hidden = true;
+        deleteContainer.hidden = true;
+
+        var info = document.getElementById("info");
+        var sec = document.getElementById("sec");
+        var del = document.getElementById("del");
+
+        info.classList.remove("active");
+        sec.classList.remove("active");
+        del.classList.remove("active");
+
+        if(id == "info"){
+            informationContainer.hidden = false;
+            info.classList.add("active");
+        }
+        else if(id == "sec"){
+            securityContainer.hidden = false;
+            sec.classList.add("active");
+        }
+        else if(id == "del"){
+            deleteContainer.hidden = false;
+            del.classList.add("active");
+        }
+    }
+
+    function validatePasswords(){
+        var newPassword = document.getElementById("newPassword");
+        var cpassword = document.getElementById("cpassword");
+
+        if(newPassword.value != cpassword.value){
+            newPassword.classList.add("is-invalid");
+            cpassword.classList.add("is-invalid");
+            return false;
+        }
+        else{
+            newPassword.classList.remove("is-invalid");
+            cpassword.classList.remove("is-invalid");
+            return true;
+        }
+    }
+
+</script>

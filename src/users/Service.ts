@@ -22,6 +22,64 @@ export class UserService{
         return UserService._instance;
     }
 
+    public async edit(id: string, username?: string, email?: string, oldPassword?: string, newPassword?: string){
+        return new Promise<User>(async (resolve, reject) => {
+            var user = await UserService._repository.findById(id);
+
+            if(!user){
+                reject('User not found');
+                return;
+            }
+
+            if (username && user.username != username) {
+                var foundByUsername = await UserService._repository.findByUsername(username);
+
+                if (foundByUsername) {
+                    reject('Username already exists');
+                    return;
+                }
+            }
+
+            if (email && user.email != email) {
+                var foundByEmail = await UserService._repository.findByEmail(email);
+
+                if (foundByEmail) {
+                    reject('Email already exists');
+                    return;
+                }
+            }
+
+            if (oldPassword && user.password != oldPassword) {
+                reject('Invalid password');
+                return;
+            }
+
+            // Todo: hash password
+            if (newPassword) {
+                user.password = newPassword;
+            }
+
+            var userObj = new User(user.username, user.email, user.password, user.roles, user.created, new Date());
+            userObj.id = user.id;
+
+            this.update(userObj).then((user) => {
+                resolve(userObj);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    public async update(user: User): Promise<User> {
+        return new Promise<User>(async (resolve, reject) => {
+            UserService._repository.update(user).then((user) => {
+                resolve(user);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
     public async delete(id: string): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             UserService._repository.delete(id).then((result) => {

@@ -24,14 +24,106 @@ export class UserController {
         this._sessionService = SessionService.getInstance();
 
         router.get('/login', this._authHandler.verify(new USSecret()), async (req, res) => {
-            res.sendFile('login.ejs', { root: __dirname + '/../views/' });
+            res.sendFile('login.html', { root: __dirname + '/../views/' });
         })
 
         router.get('/register', this._authHandler.verify(new USSecret()), async (req, res) => {
-            res.sendFile('register.ejs', { root: __dirname + '/../views/' });
+            res.sendFile('register.html', { root: __dirname + '/../views/' });
+        });
+
+        router.get('/profile', this._authHandler.verify(new USSecret()), async (req, res) => {
+            var data = res.locals.data as JwtPayload;
+
+            if (!data.user) {
+                res.status(400).send('User is required');
+                return;
+            }
+
+            var user = await this._userService.findById(data.user.id);
+
+            if (!user) {
+                res.status(400).send('User not found');
+                return;
+            }
+
+            var userSession = await this._sessionService.find(data.user.session.id);
+
+            if (!userSession) {
+                res.status(400).send('Session not found');
+                return;
+            }
+
+            var token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, userSession) }, new USSecret());
+
+            res.cookie('profile', token, { maxAge: 900000, httpOnly: true });
+
+            res.status(200).sendFile('profile.html', { root: __dirname + '/../views/' });
         });
 
         //! ========================== POST METHODS ==========================
+
+        router.post('/edit', this._authHandler.verify(new USSecret()), async (req, res) => {
+            var data = res.locals.data as JwtPayload;
+
+            if (!data.body) {
+                res.status(400).send('Body is required');
+                return;
+            }
+
+            if (!data.id){
+                res.status(400).send('User id is required');
+                return;
+            }
+
+            var id = data.id;
+
+            var section = data.body.section;
+
+            if (!section) {
+                res.status(400).send('Section is required');
+                return;
+            }
+
+            if (section == 'information') {
+                var username = data.body.username.trim();
+                var email = data.body.email.trim();
+
+                if (!username || !email) {
+                    res.status(400).send({
+                        message: 'Username, email and roles are required (first)',
+                        badFields: ['username', 'email']
+                    });
+                    return;
+                }
+
+            } else if (section == 'password') {
+                var oldPassword = data.body.oldPassword.trim();
+                var newPassword = data.body.newPassword.trim();
+
+                if (!oldPassword || !newPassword) {
+                    res.status(400).send({
+                        message: 'Old password and new password are required',
+                        badFields: ['oldPassword', 'newPassword']
+                    });
+                    return;
+                }
+            } else {
+                res.status(400).send('Section is invalid');
+                return;
+            }
+
+            this._userService.edit(id, username, email, oldPassword, newPassword).then((user) => {
+                this._sessionService.createSession(user.id, 1).then((session) => {
+                    const token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, session) }, new USSecret());
+                    res.status(200).send({token: token});
+                }).catch((err) => {
+                    res.status(400).send(err);
+                });
+            }).catch((err) => {
+                res.status(400).send(err);
+            });
+
+        })
 
         router.post('/delete', this._authHandler.verify(new USSecret()), async (req, res) => {
             var data = res.locals.data as JwtPayload;

@@ -19,6 +19,26 @@ export class SessionService{
         return SessionService._instance;
     }
 
+    public async find(id: string): Promise<Session> {
+        return new Promise<Session>(async (resolve, reject) => {
+            SessionService._repository.findById(id).then((session) => {
+                resolve(session);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    public async findByUserId(userId: string): Promise<Session> {
+        return new Promise<Session>(async (resolve, reject) => {
+            SessionService._repository.findByUserId(userId).then((session) => {
+                resolve(session);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
     public async createSession(userId: string, validHours: number): Promise<Session> {
         return new Promise<Session>(async (resolve, reject) => {
             var oldSession = await SessionService._repository.findByUserId(userId);
