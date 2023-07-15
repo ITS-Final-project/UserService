@@ -11,6 +11,51 @@ export class UserService{
         UserService._repository = new UserRepository(this._collection);
     }
 
+    public async getRegistrationStats(): Promise<any> {
+        // Get number of users registered per month for the last 6 months
+        var now = new Date();
+        var sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(now.getMonth() - 6);
+
+        var filter = {
+            created: {
+                $gte: sixMonthsAgo,
+                $lte: now
+            }
+        };
+
+        var users = await UserService._repository.search(filter, 0, 0);
+        var stats = {} as any;
+
+        users.forEach((user) => {
+            var month = user.created.getMonth();
+            if(!stats[month]){
+                stats[month] = 0;
+            }
+
+            stats[month] += 1;
+        });
+
+        return stats;
+    }
+
+    public async checkPassword(id: string, password: string): Promise<boolean> {
+        return new Promise<boolean>(async (resolve, reject) => {
+            var user = await UserService._repository.findById(id);
+            if(!user){
+                reject('User not found');
+                return;
+            }
+
+            if(user.password != password){
+                reject('Invalid password');
+                return;
+            }
+
+            resolve(true);
+        });
+    }
+
     public async findById(id: string): Promise<User> {
         return await UserService._repository.findById(id);
     }
@@ -22,7 +67,7 @@ export class UserService{
         return UserService._instance;
     }
 
-    public async edit(id: string, username?: string, email?: string, oldPassword?: string, newPassword?: string){
+    public async edit(id: string, username?: string, email?: string, newPassword?: string){
         return new Promise<User>(async (resolve, reject) => {
             var user = await UserService._repository.findById(id);
 
@@ -47,11 +92,6 @@ export class UserService{
                     reject('Email already exists');
                     return;
                 }
-            }
-
-            if (oldPassword && user.password != oldPassword) {
-                reject('Invalid password');
-                return;
             }
 
             // Todo: hash password

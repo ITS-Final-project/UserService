@@ -148,27 +148,20 @@
                 <div class="card-header">
                     <h3>Brisanje naloga</h3>
                 </div>
-                <form action="/user/edit" method="post">
+                <form action="/user/delete" method="post">
                     <div class="card-body">
                         <input type="hidden" name="section" value="information">
                         <div class="form-group mb-3">
-                            <label for="username">Korisničko ime</label>
+                            <label for="password">Korisnička lozinka</label>
                             <div class="input-group">
-                                <input name="username" type="text" class="form-control input-control input-control-disabled" id="username" placeholder="Korisniško ime" value="Korisniško ime" readonly>
-                                <button type="button" id="lock-username" onclick="enableField('username')" class="input-group-text btn-change"><i class="bi bi-lock-fill"></i></button>
-                            </div>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="email">Email</label>
-                            <div class="input-group">
-                                <input name="email" type="text" class="form-control input-control input-control-disabled" id="email" placeholder="Email" value="Email" readonly>
-                                <button type="button" id="lock-email" onclick="enableField('email')" class="input-group-text btn-change"><i class="bi bi-lock-fill"></i></button>
+                                <input required name="password" type="password" class="form-control input-control input-control-disabled" id="password" placeholder="Korisnička lozinka" readonly>
+                                <button type="button" id="lock-password" onclick="enableField('password')" class="input-group-text btn-change"><i class="bi bi-lock-fill"></i></button>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer">
                         <div class="form-group d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary">Sačuvaj</button>
+                            <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Obriši nalog</button>
                         </div>
                     </div>
                 </form>

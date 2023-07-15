@@ -23,6 +23,22 @@ export class UserController {
         this._authHandler = AuthHandler.getInstance();
         this._sessionService = SessionService.getInstance();
 
+        router.get('/get', this._authHandler.verify(new USSecret()), async (req, res) => {
+            var data = res.locals.data as JwtPayload;
+
+            if (!data.id) {
+                res.status(400).send('Id is required');
+                return;
+            }
+
+            this._userService.findById(data.id).then((user) => {
+                const token = jwtConfiguration.sign({ user: user }, new USSecret());
+                res.status(200).send({token: token});
+            }).catch((err) => {
+                res.status(400).send(err);
+            });
+        })
+
         router.get('/login', this._authHandler.verify(new USSecret()), async (req, res) => {
             res.sendFile('login.html', { root: __dirname + '/../views/' });
         })
@@ -59,6 +75,14 @@ export class UserController {
 
             res.status(200).sendFile('profile.html', { root: __dirname + '/../views/' });
         });
+
+        router.get('/regstats', this._authHandler.verify(new USSecret()), async (req, res) => {
+            console.log('here');
+            
+            this._userService.getRegistrationStats().then((stats) => {
+                res.status(200).send(stats);
+            })
+        })
 
         //! ========================== POST METHODS ==========================
 
@@ -107,12 +131,17 @@ export class UserController {
                     });
                     return;
                 }
+
+                this._userService.checkPassword(id, oldPassword).catch((err) => {
+                    res.status(400).send(err);
+                    return;
+                });
             } else {
                 res.status(400).send('Section is invalid');
                 return;
             }
 
-            this._userService.edit(id, username, email, oldPassword, newPassword).then((user) => {
+            this._userService.edit(id, username, email, newPassword).then((user) => {
                 this._sessionService.createSession(user.id, 1).then((session) => {
                     const token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, session) }, new USSecret());
                     res.status(200).send({token: token});
@@ -133,8 +162,17 @@ export class UserController {
                 return;
             }
 
-            this._userService.delete(data.deleteId).then((ack) => {
-                res.status(200).send(ack);
+            if (!data.password) {
+                res.status(400).send('Password is required');
+                return;
+            }
+
+            this._userService.checkPassword(data.deleteId, data.password).then((ack) => {
+                this._userService.delete(data.deleteId).then((ack) => {
+                    res.status(200).send(ack);
+                }).catch((err) => {
+                    res.status(400).send(err);
+                });
             }).catch((err) => {
                 res.status(400).send(err);
             });

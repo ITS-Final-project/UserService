@@ -1,8 +1,26 @@
-{
-    "username": "admin",
-    "password": "admin",
-    "email": "admin.1@localhost",
-    "firstName": "Admin",
-    "lastName": "Admin",
-    "role": "admin"
-}
+ [
+    {
+        "_id": "ObjectId('64987e49a2d425f4f1fd991f')",
+        "id": "xxxxxxxx-378a-xxxx-xxxx-c9ad5909a672",
+        "created": "ISODate('2023-06-25T17:50:00.969Z')",
+        "updated": "ISODate('2023-06-27T14:51:31.237Z')",
+        "roles": [ "user", "admin" ],
+        "username": "AnTasMes",
+        "email": "akitasevski112@gmail.com",
+        "password": "xxxxxxxxx"
+    }
+,
+    {
+        "_id": "ObjectId('64a155374b0ae7e5feda3ee6')",
+        "id": "xxxxxxxx-5ed8-41c2-xxxx-dc6cab7bdc6f",
+        "created": "ISODate('2023-07-02T10:45:11.887Z')",
+        "updated": "ISODate('2023-07-02T10:45:11.887Z')",
+        "token": "024iqz6huwlcgu99bhdf86i",
+        "userId": "xxxxxxxx-378a-xxxx-xxxx-c9ad5909a672",
+        "validFrom": "ISODate('2023-07-02T10:45:11.887Z')",
+        "validHours": 1,
+        "validTo": "ISODate('2023-07-02T11:45:11.887Z')"
+    }
+ 
+
+]
