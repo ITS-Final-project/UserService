@@ -11,11 +11,10 @@ export class MongoServerConfiguration {
     private static USE_CREDS = process.env.USE_CREDS || "false";
     public static CONNECTION_STRING = 
         MongoServerConfiguration.USE_CREDS === "true" ?
-        "mongodb://" 
-        + MongoServerConfiguration.USER + ":" + MongoServerConfiguration.PASSWORD 
+        MongoServerConfiguration.USER + ":" + MongoServerConfiguration.PASSWORD 
         + "@" + MongoServerConfiguration.HOST + ":" + MongoServerConfiguration.PORT 
         + "/" + MongoServerConfiguration.DATABASE
         :
-        "mongodb://" + MongoServerConfiguration.HOST + ":" + MongoServerConfiguration.PORT + "/" + MongoServerConfiguration.DATABASE
+        MongoServerConfiguration.HOST + ":" + MongoServerConfiguration.PORT + "/" + MongoServerConfiguration.DATABASE
 }
     
