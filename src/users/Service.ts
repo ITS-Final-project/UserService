@@ -67,7 +67,7 @@ export class UserService{
         return UserService._instance;
     }
 
-    public async edit(id: string, username?: string, email?: string, newPassword?: string){
+    public async edit(id: string, username?: string, email?: string, newPassword?: string, roles?: string[]){
         return new Promise<User>(async (resolve, reject) => {
             var user = await UserService._repository.findById(id);
 
@@ -76,6 +76,8 @@ export class UserService{
                 return;
             }
 
+            console.log(username)
+
             if (username && user.username != username) {
                 var foundByUsername = await UserService._repository.findByUsername(username);
 
@@ -83,6 +85,8 @@ export class UserService{
                     reject('Username already exists');
                     return;
                 }
+
+                user.username = username;
             }
 
             if (email && user.email != email) {
@@ -92,6 +96,8 @@ export class UserService{
                     reject('Email already exists');
                     return;
                 }
+
+                user.email = email;
             }
 
             // Todo: hash password
@@ -99,8 +105,14 @@ export class UserService{
                 user.password = newPassword;
             }
 
+            if (roles) {
+                user.roles = roles;
+            }
+
             var userObj = new User(user.username, user.email, user.password, user.roles, user.created, new Date());
             userObj.id = user.id;
+
+            console.log(userObj)
 
             this.update(userObj).then((user) => {
                 resolve(userObj);

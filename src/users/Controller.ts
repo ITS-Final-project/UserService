@@ -102,13 +102,25 @@ export class UserController {
             var id = data.id;
 
             var section = data.body.section;
+            var selcted = false;
 
             if (!section) {
                 res.status(400).send('Section is required');
                 return;
             }
 
-            if (section == 'information') {
+            // If section is not an array, make it an array
+            if (!Array.isArray(section)) {
+                section = [section];
+            }
+
+            if (section.length < 1) {
+                res.status(400).send('Section is required');
+                return;
+            }
+
+            // If section contains 'information'
+            if (section.includes('information')) {
                 var username = data.body.username.trim();
                 var email = data.body.email.trim();
 
@@ -120,7 +132,11 @@ export class UserController {
                     return;
                 }
 
-            } else if (section == 'password') {
+                selcted = true;
+            } 
+
+            // If section contains 'password'
+            if (section.includes('password')) {
                 var oldPassword = data.body.oldPassword.trim();
                 var newPassword = data.body.newPassword.trim();
 
@@ -136,12 +152,30 @@ export class UserController {
                     res.status(400).send(err);
                     return;
                 });
-            } else {
-                res.status(400).send('Section is invalid');
-                return;
+
+                selcted = true;
+            } 
+            
+            if (section.includes('roles')) {
+                var roles = data.body.roles;
+
+                if (!roles) {
+                    res.status(400).send({
+                        message: 'Roles are required',
+                        badFields: ['roles']
+                    });
+                    return;
+                }
+
+                selcted = true;
             }
 
-            this._userService.edit(id, username, email, newPassword).then((user) => {
+            if (section.includes('passwordAdmin')){
+                var newPassword = data.body.newPassword.trim();
+                selcted = true;
+            }
+
+            this._userService.edit(id, username, email, newPassword, roles).then((user) => {
                 this._sessionService.createSession(user.id, 1).then((session) => {
                     const token = jwtConfiguration.sign({ user: new UserResponse(user.id, user.username, user.email, user.roles, session) }, new USSecret());
                     res.status(200).send({token: token});
