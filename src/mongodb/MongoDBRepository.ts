@@ -137,6 +137,8 @@ export abstract class MongoRepository<T extends Model> implements IMongoReposito
         catch(err)
         {
             console.log("Error connecting to MongoDB: " + err);
+            console.log(" - Connection string: " + MongoServerConfiguration.CONNECTION_STRING);
+            console.log(" - Database: " + MongoServerConfiguration.DATABASE);
             // this.logData.method = "_isConnected";
             // this.logData.error = err;
             // logger.error(this.logData)
