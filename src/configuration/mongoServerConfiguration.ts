@@ -11,7 +11,7 @@ export class MongoServerConfiguration {
     private static USE_CREDS = process.env.USE_CREDS || "false";
     public static CONNECTION_STRING = 
         MongoServerConfiguration.USE_CREDS === "true" ?
-        MongoServerConfiguration.USER + ":" + MongoServerConfiguration.PASSWORD 
+        "mongodb://" + MongoServerConfiguration.USER + ":" + MongoServerConfiguration.PASSWORD 
         + "@" + MongoServerConfiguration.HOST + ":" + MongoServerConfiguration.PORT 
         + "/" + MongoServerConfiguration.DATABASE
         :
