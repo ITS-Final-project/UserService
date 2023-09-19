@@ -124,11 +124,11 @@
     <div class="d-flex align-items-center h-75">
         <div class="w-50 card mx-auto p-5 login-container">
             <div class="card-title">
-                <h1 class="text-center text-light">Login</h1>
+                <h1 class="text-center text-light">Prijava</h1>
             </div>
             <form action="/user/login" method="post">
                 <div class="mb-3 mt-3">
-                    <label for="usernameOrEmail" class="form-label text-light">Username or Email</label>
+                    <label for="usernameOrEmail" class="form-label text-light">Korisničko ime ili email</label>
                     <div class="input-group">
                         <label for="usernameOrEmail" class="input-group-text text-light group-text"><i class="bi bi-envelope"></i></label>
                         <input type="text" name="usernameOrEmail" id="usernameOrEmail" class="form-control input-control" placeholder="example@company.com" required>
@@ -136,10 +136,10 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="password" class="form-label text-light">Password</label>
+                    <label for="password" class="form-label text-light">Lozinka</label>
                     <div class="input-group">
                         <label for="password" class="input-group-text text-light group-text"><i class="bi bi-lock-fill"></i></label>
-                        <input type="password" name="password" id="password" class="form-control input-control" placeholder="Password" required>
+                        <input type="password" name="password" id="password" class="form-control input-control" placeholder="Lozinka" required>
                     </div>
                 </div>
 
@@ -151,14 +151,14 @@
 
                 <div class="mb-3">
                     <div class="d-flex justify-content-end">
-                        <a href="/user/forgot" class="text-light">Forgot password?</a>
+                        <a href="/user/forgot" class="text-light">Zaboravljena lozinka?</a>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
                     <div class="d-flex justify-content-between">
-                        <a href="/user/register" class="btn w-50 btn-register m-1">Register</a>
-                        <button type="submit" class="btn w-50 btn-login m-1">Login</button>
+                        <a href="/user/register" class="btn w-50 btn-register m-1">Registruj nalog</a>
+                        <button type="submit" class="btn w-50 btn-login m-1">Prijavi se</button>
                     </div>
                 </div>
             </form>
@@ -168,7 +168,7 @@
 
 <script>
     function showError(){
-        var error = "Username or password is incorrect";
+        var error = "Korisničko ime ili lozinka nisu dobri.";
         var errorContainer = document.getElementById("error-container");
         var errorText = document.getElementById("error-text");
 

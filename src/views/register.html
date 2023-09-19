@@ -112,15 +112,15 @@
     <div class="d-flex align-items-center h-75">
         <div class="w-50 card mx-auto p-5 register-container">
             <div class="card-title">
-                <h1 class="text-center text-light">Register</h1>
+                <h1 class="text-center text-light">Registracija</h1>
             </div>
             <form action="/user/register" method="post">
                 <div class="mb-3 mt-3">
                     
-                    <label for="username" class="form-label text-light">Username</label>
+                    <label for="username" class="form-label text-light">Korisničko ime</label>
                     <div class="input-group">
                         <label for="username" class="input-group-text text-light group-text"><i class="bi bi-person-circle"></i></label>
-                        <input type="text" name="username" id="username" class="form-control input-control" placeholder="Username" required>
+                        <input type="text" name="username" id="username" class="form-control input-control" placeholder="Korisničko ime" required>
                     </div>
                 </div>
 
@@ -133,25 +133,25 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="password" class="form-label text-light">Password</label>
+                    <label for="password" class="form-label text-light">Lozinka</label>
                     <div class="input-group">
                         <label for="password" class="input-group-text text-light group-text"><i class="bi bi-lock"></i></label>
-                        <input onchange="strongPassword()" type="password" name="password" id="password" class="form-control input-control" placeholder="Password" required>
+                        <input onchange="strongPassword()" type="password" name="password" id="password" class="form-control input-control" placeholder="Lozinka" required>
                     </div>
                 </div>
 
                 <div class="mb-4">
-                    <label for="confirmPassword" class="form-label text-light">Confirm Password</label>
+                    <label for="confirmPassword" class="form-label text-light">Ponovi lozinku</label>
                     <div class="input-group">
                         <label for="confirmPassword" class="input-group-text text-light group-text"><i class="bi bi-lock-fill"></i></label>
-                        <input type="password" name="confirmPassword" id="confirmPassword" class="form-control input-control" placeholder="Confirm Password" required>
+                        <input type="password" name="confirmPassword" id="confirmPassword" class="form-control input-control" placeholder="Ponovi lozinku" required>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="d-flex justify-content-between">
-                        <a href="/user/login" class="btn w-50 btn-login m-1">Login</a>
-                        <button onclick="checkPasswords()" type="submit" class="btn w-50 btn-register m-1">Register</button>
+                        <a href="/user/login" class="btn w-50 btn-login m-1">Prijavi se</a>
+                        <button onclick="checkPasswords()" type="submit" class="btn w-50 btn-register m-1">Registruj se</button>
                     </div>
                 </div>
             </form>
@@ -160,15 +160,15 @@
     <div class="w-50 card mx-auto pt-3 register-container">
         <div class="text-center text-light">
             <p>
-                Password must contain:
+                Lozinka mora sadržati:
                 <br>
-                At least 8 characters
+                Najmanje 8 karaktera
                 <br>
-                At least one uppercase letter
+                Najmanje jedno veliko slovo
                 <br>
-                At least one lowercase letter
+                Najmanje jedno malo slovo
                 <br>
-                At least one number
+                Najmanje jedan broj
             </p>
         </div>
     </div>
